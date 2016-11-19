@@ -13,11 +13,18 @@ namespace ToolKit {
         public Form1() {
             InitializeComponent();
         }
+        string inputfile;
+        string inputdir;
+        string outputdir;
 
         private void buttonBrowseInputFile_Click(object sender, EventArgs e) {
             openFileDialog1.ShowDialog();
             inputFile.Text = openFileDialog1.FileName;
+        }
 
+        private void buttonBrowseInputDir_Click(object sender, EventArgs e) {
+            folderBrowserDialogIn.ShowDialog();
+            inputDirectory.Text = folderBrowserDialogIn.SelectedPath;
         }
 
         private void buttonBrowseOutputDir_Click(object sender, EventArgs e) {
@@ -26,32 +33,39 @@ namespace ToolKit {
         }
 
         private void buttonUnpack_Click(object sender, EventArgs e) {
-            Tex.Unpack(inputFile.Text, outputDirectory.Text);
-        }
-
-        private void buttonBrowseInputDir_Click(object sender, EventArgs e) {
-            folderBrowserDialogIn.ShowDialog();
-            inputDirectory.Text = folderBrowserDialogIn.SelectedPath;
+            Tex.Unpack(inputfile, outputdir);
         }
 
         private void buttonDecompressMT_Click(object sender, EventArgs e) {
-            Tex.LzssDir(1, inputDirectory.Text, outputDirectory.Text);
+            Tex.LzssDir(1, inputdir, outputdir);
         }
 
         private void buttonDecode_Click(object sender, EventArgs e) {
-            Tex.Picture.DecodeDir(inputDirectory.Text, outputDirectory.Text, 4);
+            Tex.Picture.DecodeDir(inputdir, outputdir, 4);
         }
 
         private void buttonEncode_Click(object sender, EventArgs e) {
-            Tex.Picture.EncodeDir(inputDirectory.Text, outputDirectory.Text, 4);
+            Tex.Picture.EncodeDir(inputdir, outputdir, 4);
         }
 
         private void Aio_1_Click(object sender, EventArgs e) {
-            Tex.Aio_U(inputFile.Text, outputDirectory.Text);
+            Tex.Aio_U(inputfile, outputdir);
         }
 
         private void Aio_2_Click(object sender, EventArgs e) {
-            Tex.Aio_U_D(inputDirectory.Text, outputDirectory.Text, 4);
+            Tex.Aio_U_D(inputdir, outputdir, 4);
+        }
+
+        private void inputFile_TextChanged(object sender, EventArgs e) {
+            inputfile = inputFile.Text;
+        }
+
+        private void inputDirectory_TextChanged(object sender, EventArgs e) {
+            inputdir = inputDirectory.Text;
+        }
+
+        private void outputDirectory_TextChanged(object sender, EventArgs e) {
+            outputdir = outputDirectory.Text;
         }
     }
 }

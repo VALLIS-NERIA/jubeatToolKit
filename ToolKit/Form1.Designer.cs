@@ -50,6 +50,7 @@
             this.inputFile.Name = "inputFile";
             this.inputFile.Size = new System.Drawing.Size(177, 21);
             this.inputFile.TabIndex = 0;
+            this.inputFile.TextChanged += new System.EventHandler(this.inputFile_TextChanged);
             // 
             // outputDirectory
             // 
@@ -57,6 +58,7 @@
             this.outputDirectory.Name = "outputDirectory";
             this.outputDirectory.Size = new System.Drawing.Size(177, 21);
             this.outputDirectory.TabIndex = 1;
+            this.outputDirectory.TextChanged += new System.EventHandler(this.outputDirectory_TextChanged);
             // 
             // buttonBrowseInputFile
             // 
@@ -145,6 +147,7 @@
             this.inputDirectory.Name = "inputDirectory";
             this.inputDirectory.Size = new System.Drawing.Size(177, 21);
             this.inputDirectory.TabIndex = 0;
+            this.inputDirectory.TextChanged += new System.EventHandler(this.inputDirectory_TextChanged);
             // 
             // buttonDecompressMT
             // 
