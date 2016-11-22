@@ -41,6 +41,7 @@
             this.buttonEncode = new System.Windows.Forms.Button();
             this.Aio_1 = new System.Windows.Forms.Button();
             this.Aio_2 = new System.Windows.Forms.Button();
+            this.buttonRepack = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -207,11 +208,22 @@
             this.Aio_2.UseVisualStyleBackColor = false;
             this.Aio_2.Click += new System.EventHandler(this.Aio_2_Click);
             // 
+            // buttonRepack
+            // 
+            this.buttonRepack.Location = new System.Drawing.Point(13, 237);
+            this.buttonRepack.Name = "buttonRepack";
+            this.buttonRepack.Size = new System.Drawing.Size(75, 23);
+            this.buttonRepack.TabIndex = 11;
+            this.buttonRepack.Text = "Repack";
+            this.buttonRepack.UseVisualStyleBackColor = true;
+            this.buttonRepack.Click += new System.EventHandler(this.buttonRepack_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(374, 394);
+            this.Controls.Add(this.buttonRepack);
             this.Controls.Add(this.Aio_2);
             this.Controls.Add(this.Aio_1);
             this.Controls.Add(this.buttonEncode);
@@ -250,6 +262,7 @@
         private System.Windows.Forms.Button buttonEncode;
         private System.Windows.Forms.Button Aio_1;
         private System.Windows.Forms.Button Aio_2;
+        private System.Windows.Forms.Button buttonRepack;
     }
 }
 

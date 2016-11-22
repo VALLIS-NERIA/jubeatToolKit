@@ -51,17 +51,13 @@ namespace ToolKit {
             return System.BitConverter.ToInt32(buf, 0);
         }
 
-        static byte[] switchendian(byte[] little) {
+        static byte[] SwitchEndian(byte[] little) {
             int l = little.Length;
-            int padl = l - l % 4 + 4;
             int n;
-            byte[] big = new byte[padl];
-            for (int i = 0; i < padl; i++) {
-                n = 4 * (int)(i / 4) - (i % 4);
-                if (n < l)
-                    big[i] = little[n];
-                else
-                    big[i] = 0x00;
+            byte[] big = new byte[l];
+            for (int i = 0; i < l; i++) {
+                n = 3 + 8 * (int)(i / 4) - i;
+                big[i] = little[n];
             }
             return big;
         }
@@ -155,7 +151,7 @@ namespace ToolKit {
                 Directory.CreateDirectory(outputfolder);
                 string outfile = outputfolder + file.Name;
                 FileStream fwrite = new FileStream(outfile, FileMode.Create);
-                fwrite.Write(buf, 0, file.Length);
+                fwrite.Write(buf, 0, file.Length - 8);
                 fwrite.Close();
             }
             f.Close();
@@ -168,29 +164,33 @@ namespace ToolKit {
         /// <param name="outputfile">输出目标</param>
         /// <param name="originalbin">用作参照的原始bin文件</param>
         /// <param name="inputfolder_uncompressed">lzss压缩前的文件的目录</param>
-        public static unsafe void Repack(string inputfolder, string outputfile, string originalbin, string inputfolder_uncompressed) {
+        public static unsafe void Repack(string inputfolder, string inputfolder_uncompressed, string outputfile, string originalbin) {
             FileStream ori = new FileStream(originalbin, FileMode.Open, FileAccess.ReadWrite);
 
             ori.Seek(0x3c, SeekOrigin.Begin);
             int fileMapBegin = readint(ref ori);
             ori.Seek(0x50, SeekOrigin.Begin);
             int fileNum = readint(ref ori);
+            int fileNum_1 = fileNum;
             ori.Seek(8 + 12 * fileNum, SeekOrigin.Current);
             List<string> fileNameList = new List<string>();
             string nameBuf = "";
-            while (fileNum > 0) {
+            while (fileNum_1 > 0) {
                 byte b = (byte)ori.ReadByte();
                 if (b != '\0')
                     nameBuf += (char)b;
                 else {
                     fileNameList.Add(nameBuf);
                     nameBuf = "";
-                    fileNum--;
+                    fileNum_1--;
                 }
             }
             ori.Seek(0, SeekOrigin.Begin);
-            FileStream w = new FileStream(outputfile, FileMode.Create, FileAccess.ReadWrite);
-            ori.CopyTo(w, fileMapBegin);
+            FileStream newbin = new FileStream(outputfile, FileMode.Create, FileAccess.ReadWrite);
+            byte[] buf1=new byte[fileMapBegin];
+            ori.Read(buf1,0,fileMapBegin);
+            newbin.Write(buf1,0,fileMapBegin);
+            ori.Close();
 
             //0,length,address
             //mapBuf暂存filemap，之后一起写入。
@@ -199,27 +199,53 @@ namespace ToolKit {
             fixed (byte* pb = &mapBuf[0]) {
                 int* p = (int*)pb;
                 int address = fileaddress;
-                w.Write(mapBuf, 0, mapBuf.Length);//占位
+                newbin.Write(mapBuf, 0, mapBuf.Length);//占位
 
                 foreach (string file in fileNameList) {
-                    FileStream f = new FileStream(inputfolder + "\\" + file, FileMode.Open, FileAccess.Read);
+                    FileStream f_zipped = new FileStream(inputfolder + "\\" + file, FileMode.Open, FileAccess.Read);
                     //更新filemap
                     *p++ = 0;
-                    *p++ = (int)f.Length + 8;
+                    *p++ = (int)f_zipped.Length + 8;
                     //SIZE,ZIPPED_SIZE,正文。所以+8。
                     *p++ = address;
-                    address += (int)f.Length + 8;
+                    address += (int)f_zipped.Length + 8;
 
                     //写入文件
                     //SIZE
                     FileStream f_unzipped = new FileStream(inputfolder_uncompressed + "\\" + file, FileMode.Open, FileAccess.Read);
-
+                    int t = (int)f_unzipped.Length;
+                    int unzipped_size = t - t % 0xf;
+                    newbin.Write(SwitchEndian(BitConverter.GetBytes(f_unzipped.Length )), 0, 4);
                     //ZIPPED_SIZE
+                    int zipped_size = (int)f_zipped.Length;
+                    newbin.Write(SwitchEndian(BitConverter.GetBytes(zipped_size)), 0, 4);
+
                     //正文
+                    f_zipped.CopyTo(newbin);
+
+                    //32位对齐
+                    //因为ori是对齐的，所以直到写完第一个文件之前肯定都是对齐的
+                    if (f_zipped.Length % 4 != 0) {
+                        int padl = 4 - (int)f_zipped.Length % 4;
+                        for (; padl > 0; padl--) {
+                            newbin.WriteByte(0x00);
+                            address++;
+                        }
+                    }
+
+
+                    f_zipped.Close();
+                    f_unzipped.Close();
                 }
+
+                //所有文件都写回之后，写入mapBuf。
+                newbin.Seek(fileMapBegin, SeekOrigin.Begin);
+                newbin.Write(mapBuf, 0, 12 * fileNum);
+                newbin.Close();
+
             }
         }
-        
+
         /// <summary>
         /// 异步、多线程地对文件夹中的所有文件进行lzss压缩/解压缩。
         /// </summary>
@@ -227,8 +253,8 @@ namespace ToolKit {
         /// <param name="inputfolder">输入文件夹</param>
         /// <param name="outputfolder">输出文件夹</param>
         /// <param name="threadcount">最大线程数</param>
-        /// <returns>一个</returns>
-        public static Task[] LzssDir(int mode, string inputfolder, string outputfolder,int threadcount) {
+        /// <returns>表示每个文件执行过程的Task数组</returns>
+        public static Task[] LzssDir(int mode, string inputfolder, string outputfolder, int threadcount) {
             string[] files = Directory.GetFiles(inputfolder);
             //ThreadPool.SetMaxThreads(threadcount, threadcount);
             string name = Path.GetFileName(inputfolder);
@@ -237,7 +263,7 @@ namespace ToolKit {
             int i = 0;
             foreach (string file in files) {
                 string outputfile = outputfolder + Path.GetFileName(file);
-                tasks[i++] = Task.Factory.StartNew(LzssAsync, new LzssPara(mode, file, outputfile),TaskCreationOptions.PreferFairness);
+                tasks[i++] = Task.Factory.StartNew(LzssAsync, new LzssPara(mode, file, outputfile), TaskCreationOptions.PreferFairness);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(LzssAsync), new LzssPara(mode, file, outputfile));
             }
             return tasks;

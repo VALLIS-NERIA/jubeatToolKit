@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace ToolKit {
     public partial class Form1 : Form {
@@ -30,6 +31,18 @@ namespace ToolKit {
         private void buttonBrowseOutputDir_Click(object sender, EventArgs e) {
             folderBrowserDialogOut.ShowDialog();
             outputDirectory.Text = folderBrowserDialogOut.SelectedPath;
+        }
+
+        private void inputFile_TextChanged(object sender, EventArgs e) {
+            inputfile = inputFile.Text;
+        }
+
+        private void inputDirectory_TextChanged(object sender, EventArgs e) {
+            inputdir = inputDirectory.Text;
+        }
+
+        private void outputDirectory_TextChanged(object sender, EventArgs e) {
+            outputdir = outputDirectory.Text;
         }
 
         private void buttonUnpack_Click(object sender, EventArgs e) {
@@ -56,16 +69,13 @@ namespace ToolKit {
             Tex.Aio_U_D(inputdir, outputdir, 4);
         }
 
-        private void inputFile_TextChanged(object sender, EventArgs e) {
-            inputfile = inputFile.Text;
-        }
-
-        private void inputDirectory_TextChanged(object sender, EventArgs e) {
-            inputdir = inputDirectory.Text;
-        }
-
-        private void outputDirectory_TextChanged(object sender, EventArgs e) {
-            outputdir = outputDirectory.Text;
+        private void buttonRepack_Click(object sender, EventArgs e) {
+            string oribin = inputfile;
+            string workingdir = Path.GetDirectoryName(inputfile);
+            string unpack = workingdir + "\\unpack\\";
+            string decompress = workingdir + "\\decompress\\";
+            string newbin = inputfile + "_new";
+            Tex.Repack(unpack, decompress, newbin, oribin);
         }
     }
 }
