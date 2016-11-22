@@ -21,21 +21,27 @@ namespace ToolKit {
                     Outputfile = outfile;
                 }
             }
+            public enum ConvertResult {
+                FormatNotMatch,
+                FileCorrupt,
+                ZeroPixel,
+                Success
+            }
 
-            static void DecodeAsync(object param) {
+            static void DecodeOne(object param) {
                 TransPara para = (TransPara)param;
                 string file = para.Inputfile;
                 string outfile = para.Outputfile;
                 //string outfile = outputfolder + "\\" + Path.GetFileNameWithoutExtension(file) + ".PNG";
-                if (Path.GetFileName(file).StartsWith("BNR")) {
-                    rgba2png(file, outfile);
+                if (rgba2png(file, outfile) != ConvertResult.Success) {
+                    try {
+                        byte2png(file,outfile);
+                    }
+                    catch (Exception e) {
+                        //return false;
+                    }
                 }
-                else if (Path.GetFileName(file).StartsWith("IDX")) {
-                    byte2png(file, outfile);
-                }
-                else {
-                    throw new System.FormatException("输入既不是BNR，也不是IDX！");
-                }
+                //return true;
             }
 
             static void EncodeAsync(object param) {
@@ -63,26 +69,37 @@ namespace ToolKit {
             /// </summary>        
             /// <param name="inputfile">输入文件</param>
             /// <param name="outputfile">输出文件</param>
-            public static void rgba2png(string inputfile, string outputfile) {
+            public static ConvertResult rgba2png(string inputfile, string outputfile) {
                 FileStream f = new FileStream(inputfile, FileMode.Open, FileAccess.ReadWrite);
+                f.Seek(0x14, SeekOrigin.Begin);
+                if(readint(ref f)!=0x11221010)
+                    return ConvertResult.FormatNotMatch;
                 f.Seek(0x10, SeekOrigin.Begin);
                 int width = readint16(ref f);
                 int height = readint16(ref f);
                 f.Seek(0x40, SeekOrigin.Begin);
-                if (width == 0 || height == 0) return;
-                Bitmap image = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                for (int y = 0; y < height; y++)
-                    for (int x = 0; x < width; x++) {
-                        byte[] buf = new byte[4];
-                        f.Read(buf, 0, 4);
-                        int r = (int)(buf[0]);
-                        int g = (int)(buf[1]);
-                        int b = (int)(buf[2]);
-                        int a = (int)(buf[3]);
-                        image.SetPixel(x, y, Color.FromArgb(a, r, g, b));
-                    }
-                image.Save(outputfile, ImageFormat.Png);
+                if (width == 0 || height == 0) 
+                    return ConvertResult.ZeroPixel;
+                try {
+                    Bitmap image = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                    for (int y = 0; y < height; y++)
+                        for (int x = 0; x < width; x++) {
+                            byte[] buf = new byte[4];
+                            f.Read(buf, 0, 4);
+                            int r = (int)(buf[0]);
+                            int g = (int)(buf[1]);
+                            int b = (int)(buf[2]);
+                            int a = (int)(buf[3]);
+                            image.SetPixel(x, y, Color.FromArgb(a, r, g, b));
+                        }
+                    image.Save(outputfile, ImageFormat.Png);
+                }
+                catch (System.Exception e) {
+                    f.Close();
+                    return ConvertResult.FileCorrupt;
+                }
                 f.Close();
+                return ConvertResult.Success;
             }
 
             /// <summary>
@@ -112,7 +129,7 @@ namespace ToolKit {
                     //string outfile = outputfolder + "\\" + Path.GetFileName(inputfile) + ".PNG";
                     image.Save(outputfile, ImageFormat.Png);
                 }
-                catch(System.Exception e){
+                catch (System.Exception e) {
                     File.Create(outputfile + "_BROKEN");
                 }
                 f.Close();
@@ -124,20 +141,11 @@ namespace ToolKit {
             /// <param name="inputfolder">输入目录</param>
             /// <param name="outputfolder">输出目录</param>
             /// <exception cref="System.FormatException">输入文件名不是以BNR或IDX开头的</exception>
-            public static void DecodeDir(string inputfolder, string outputfolder) {
+            public static void DecodeDirSeq(string inputfolder, string outputfolder) {
                 string[] files = Directory.GetFiles(inputfolder);
                 foreach (string file in files) {
                     string outfile = outputfolder + "\\" + Path.GetFileNameWithoutExtension(file) + ".PNG";
-                    if (Path.GetFileName(file).StartsWith("BNR")) {
-                        rgba2png(file, outfile);
-                    }
-                    else if (Path.GetFileName(file).StartsWith("IDX")) {
-                        byte2png(file, outfile);
-                    }
-                    else {
-                        throw new System.FormatException("输入既不是BNR，也不是IDX！");
-                    }
-
+                    DecodeOne(new TransPara(file, outfile));
                 }
             }
 
@@ -148,14 +156,16 @@ namespace ToolKit {
             /// <param name="outputfolder">输出目录</param>
             /// <param name="threadcount">线程数</param>
             /// <exception cref="System.FormatException">输入文件名不是以BNR或IDX开头的</exception>
-            public static void DecodeDir(string inputfolder, string outputfolder, int threadcount) {
-                ThreadPool.SetMaxThreads(threadcount, threadcount);
+            /// <returns>表示每个文件执行过程的Task数组</returns>
+            public static Task[] DecodeDir(string inputfolder, string outputfolder) {
                 string[] files = Directory.GetFiles(inputfolder);
+                Task[] tasks = new Task[files.Count()];
+                int i = 0;
                 foreach (string file in files) {
                     string outfile = outputfolder + "\\" + Path.GetFileNameWithoutExtension(file) + ".PNG";
-                    ThreadPool.QueueUserWorkItem(new WaitCallback(DecodeAsync), new TransPara(file, outfile));
-
+                    tasks[i++] = Task.Factory.StartNew(DecodeOne, new TransPara(file, outfile), TaskCreationOptions.PreferFairness);
                 }
+                return tasks;
             }
 
             public static void png2rgba(string inputfile, string outputfile) {
@@ -172,7 +182,7 @@ namespace ToolKit {
                 w.Write(BitConverter.GetBytes(height), 0, 2);
                 w.Write(new byte[] { 0x10, 0x10, 0x22, 0x11 }, 0, 4);
                 buf = new byte[40];
-                buf[20] = 0x83;
+                buf[20] = 0x81;
                 w.Write(buf, 0, buf.Length);
                 //文件头
                 for (int y = 0; y < height; y++)
@@ -187,15 +197,22 @@ namespace ToolKit {
                 w.Close();
             }
 
-            public static void EncodeDir(string inputfolder, string outputfolder, int threadcount) {
-                ThreadPool.SetMaxThreads(threadcount, threadcount);
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="inputfolder"></param>
+            /// <param name="outputfolder"></param>
+            public static Task[] EncodeDir(string inputfolder, string outputfolder) {
                 string[] files = Directory.GetFiles(inputfolder);
+                Task[] tasks = new Task[files.Count()];
+                int i = 0;
                 foreach (string file in files) {
                     if (Path.GetExtension(file).ToLower().Contains("png")) {
                         string outfile = outputfolder + "\\" + Path.GetFileNameWithoutExtension(file);
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(EncodeAsync), new TransPara(file, outfile));
+                        tasks[i++] = Task.Factory.StartNew(EncodeAsync, new TransPara(file, outfile), TaskCreationOptions.PreferFairness);
                     }
                 }
+                return tasks;
             }
 
 

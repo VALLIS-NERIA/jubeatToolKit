@@ -77,21 +77,13 @@ namespace ToolKit {
             lzss(para.Mode, para.Input, para.Output);
         }
 
-        public static void Aio_U_D(string inputfolder, string outputfolder, int threadcount) {
+        public static void Aio_U_D(string inputfolder, string outputfolder) {
             string[] files = Directory.GetFiles(inputfolder);
-            ThreadPool.SetMaxThreads(threadcount, threadcount);
             string name = Path.GetFileName(inputfolder);
             Directory.CreateDirectory(outputfolder);
             foreach (string file in files) {
-                //ThreadPool.QueueUserWorkItem(new WaitCallback(Aio_U), new Para(file, outputfolder));
                 Aio_U(file, outputfolder);
-
             }
-        }
-
-        public static void Aio_U(object para) {
-            Para p = (Para)para;
-            Aio_U(p.Inputpath, p.Outputpath);
         }
 
         public static void Aio_U(string inputfile, string outputfolder) {
@@ -104,12 +96,31 @@ namespace ToolKit {
             Directory.CreateDirectory(decompressdir);
             Directory.CreateDirectory(pngdir);
             Unpack(inputfile, unpackdir);
-            Task.WaitAll(LzssDir(1, unpackdir, decompressdir, 4));
+            Task.WaitAll(LzssDir(1, unpackdir, decompressdir));
             //LzssDir(1, unpackdir, decompressdir);
-            Picture.DecodeDir(decompressdir, pngdir, 4);
+            Picture.DecodeDir(decompressdir, pngdir);
             string newfile = workingdir + "\\" + Path.GetFileName(inputfile);
             File.Copy(inputfile, newfile, true);
             File.SetAttributes(newfile, FileAttributes.Normal);
+        }
+
+        public static void Aio_R_D(string inputfolder, string outputfolder) {
+            string[] dirs = Directory.GetDirectories(inputfolder);
+            Directory.CreateDirectory(outputfolder);
+            foreach (string workingdir in dirs) {
+                string unpackdir = workingdir + "\\unpack\\";
+                string decompressdir = workingdir + "\\decompress\\";
+                string pngdir = workingdir + "\\png\\";
+                string oribin = workingdir + "\\" + Path.GetFileName(workingdir) + ".bin";
+                string outputfile = outputfolder + "\\" + Path.GetFileName(workingdir) + ".bin";
+                Aio_R(pngdir, decompressdir, unpackdir, oribin, outputfile);
+            }
+        }
+
+        public static void Aio_R(string pngdir, string decompressdir, string unpackdir, string oribin, string outputfile) {
+            Task.WaitAll(Picture.EncodeDir(pngdir, decompressdir));
+            Task.WaitAll(LzssDir(0, decompressdir, unpackdir));
+            Repack(unpackdir, decompressdir, outputfile, oribin);
         }
 
         public static void Unpack(string inputfile, string outputfolder) {
@@ -254,7 +265,7 @@ namespace ToolKit {
         /// <param name="outputfolder">输出文件夹</param>
         /// <param name="threadcount">最大线程数</param>
         /// <returns>表示每个文件执行过程的Task数组</returns>
-        public static Task[] LzssDir(int mode, string inputfolder, string outputfolder, int threadcount) {
+        public static Task[] LzssDir(int mode, string inputfolder, string outputfolder) {
             string[] files = Directory.GetFiles(inputfolder);
             //ThreadPool.SetMaxThreads(threadcount, threadcount);
             string name = Path.GetFileName(inputfolder);
@@ -275,7 +286,7 @@ namespace ToolKit {
         /// <param name="mode">0：压缩；非0：解压缩</param>
         /// <param name="inputfolder">输入文件夹</param>
         /// <param name="outputfolder">输出文件夹</param>
-        public static void LzssDir(int mode, string inputfolder, string outputfolder) {
+        public static void LzssDirSeq(int mode, string inputfolder, string outputfolder) {
             string[] files = Directory.GetFiles(inputfolder);
             foreach (string file in files) {
                 string outputfile = outputfolder + "\\" + Path.GetFileName(file);

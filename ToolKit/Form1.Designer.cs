@@ -42,6 +42,8 @@
             this.Aio_1 = new System.Windows.Forms.Button();
             this.Aio_2 = new System.Windows.Forms.Button();
             this.buttonRepack = new System.Windows.Forms.Button();
+            this.Aio_3 = new System.Windows.Forms.Button();
+            this.Aio_4 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -210,19 +212,49 @@
             // 
             // buttonRepack
             // 
-            this.buttonRepack.Location = new System.Drawing.Point(13, 237);
+            this.buttonRepack.Location = new System.Drawing.Point(12, 368);
             this.buttonRepack.Name = "buttonRepack";
-            this.buttonRepack.Size = new System.Drawing.Size(75, 23);
+            this.buttonRepack.Size = new System.Drawing.Size(75, 46);
             this.buttonRepack.TabIndex = 11;
             this.buttonRepack.Text = "Repack";
             this.buttonRepack.UseVisualStyleBackColor = true;
             this.buttonRepack.Click += new System.EventHandler(this.buttonRepack_Click);
             // 
+            // Aio_3
+            // 
+            this.Aio_3.BackColor = System.Drawing.Color.GreenYellow;
+            this.Aio_3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.Aio_3.FlatAppearance.BorderSize = 0;
+            this.Aio_3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Aio_3.Location = new System.Drawing.Point(12, 236);
+            this.Aio_3.Name = "Aio_3";
+            this.Aio_3.Size = new System.Drawing.Size(83, 46);
+            this.Aio_3.TabIndex = 12;
+            this.Aio_3.Text = "Don\'t Click";
+            this.Aio_3.UseVisualStyleBackColor = false;
+            this.Aio_3.Click += new System.EventHandler(this.Aio_3_Click);
+            // 
+            // Aio_4
+            // 
+            this.Aio_4.BackColor = System.Drawing.Color.OliveDrab;
+            this.Aio_4.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.Aio_4.Font = new System.Drawing.Font("微软雅黑", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Aio_4.ForeColor = System.Drawing.Color.Gold;
+            this.Aio_4.Location = new System.Drawing.Point(102, 236);
+            this.Aio_4.Name = "Aio_4";
+            this.Aio_4.Size = new System.Drawing.Size(254, 46);
+            this.Aio_4.TabIndex = 13;
+            this.Aio_4.Text = "DON\'T EVEN MORE CLICK";
+            this.Aio_4.UseVisualStyleBackColor = false;
+            this.Aio_4.Click += new System.EventHandler(this.Aio_4_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(374, 394);
+            this.ClientSize = new System.Drawing.Size(374, 430);
+            this.Controls.Add(this.Aio_4);
+            this.Controls.Add(this.Aio_3);
             this.Controls.Add(this.buttonRepack);
             this.Controls.Add(this.Aio_2);
             this.Controls.Add(this.Aio_1);
@@ -263,6 +295,8 @@
         private System.Windows.Forms.Button Aio_1;
         private System.Windows.Forms.Button Aio_2;
         private System.Windows.Forms.Button buttonRepack;
+        private System.Windows.Forms.Button Aio_3;
+        private System.Windows.Forms.Button Aio_4;
     }
 }
 

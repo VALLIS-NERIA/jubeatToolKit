@@ -54,11 +54,11 @@ namespace ToolKit {
         }
 
         private void buttonDecode_Click(object sender, EventArgs e) {
-            Tex.Picture.DecodeDir(inputdir, outputdir, 4);
+            Tex.Picture.DecodeDir(inputdir, outputdir);
         }
 
         private void buttonEncode_Click(object sender, EventArgs e) {
-            Tex.Picture.EncodeDir(inputdir, outputdir, 4);
+            Tex.Picture.EncodeDir(inputdir, outputdir);
         }
 
         private void Aio_1_Click(object sender, EventArgs e) {
@@ -66,7 +66,7 @@ namespace ToolKit {
         }
 
         private void Aio_2_Click(object sender, EventArgs e) {
-            Tex.Aio_U_D(inputdir, outputdir, 4);
+            Tex.Aio_U_D(inputdir, outputdir);
         }
 
         private void buttonRepack_Click(object sender, EventArgs e) {
@@ -76,6 +76,20 @@ namespace ToolKit {
             string decompress = workingdir + "\\decompress\\";
             string newbin = inputfile + "_new";
             Tex.Repack(unpack, decompress, newbin, oribin);
+        }
+
+        private void Aio_3_Click(object sender, EventArgs e) {
+            string workingdir = inputdir;
+            string unpackdir = workingdir + "\\unpack\\";
+            string decompressdir = workingdir + "\\decompress\\";
+            string pngdir = workingdir + "\\png\\";
+            string oribin = workingdir + "\\" + Path.GetFileName(workingdir) + ".bin";
+            string outputfile = oribin+"_new";
+            Tex.Aio_R(pngdir, decompressdir, unpackdir, oribin, outputfile);
+        }
+
+        private void Aio_4_Click(object sender, EventArgs e) {
+            Tex.Aio_R_D(inputdir, outputdir);
         }
     }
 }
