@@ -54,19 +54,19 @@ namespace ToolKit {
         }
 
         private void buttonDecode_Click(object sender, EventArgs e) {
-            Tex.Picture.DecodeDir(inputdir, outputdir);
+            Picture.DecodeDir(inputdir, outputdir);
         }
 
         private void buttonEncode_Click(object sender, EventArgs e) {
-            Tex.Picture.EncodeDir(inputdir, outputdir);
+            Picture.EncodeDir(inputdir, outputdir);
         }
 
         private void Aio_1_Click(object sender, EventArgs e) {
-            Tex.Aio_U(inputfile, outputdir);
+            Tex.UnpackFull(inputfile, outputdir);
         }
 
         private void Aio_2_Click(object sender, EventArgs e) {
-            Tex.Aio_U_D(inputdir, outputdir);
+            Tex.UnpackFull_D(inputdir, outputdir);
         }
 
         private void buttonRepack_Click(object sender, EventArgs e) {
@@ -85,11 +85,17 @@ namespace ToolKit {
             string pngdir = workingdir + "\\png\\";
             string oribin = workingdir + "\\" + Path.GetFileName(workingdir) + ".bin";
             string outputfile = oribin+"_new";
-            Tex.Aio_R(pngdir, decompressdir, unpackdir, oribin, outputfile);
+            Tex.RepackFull(pngdir, decompressdir, unpackdir, oribin, outputfile);
         }
 
         private void Aio_4_Click(object sender, EventArgs e) {
-            Tex.Aio_R_D(inputdir, outputdir);
+            Tex.RepackFull_D(inputdir, outputdir);
+        }
+
+        private void ifsTest_Click(object sender, EventArgs e) {
+            IFS.SetExe(Environment.CurrentDirectory + "\\dumpImgFs.exe", Environment.CurrentDirectory + "\\buildImgFS.exe");
+            string outputifs = outputdir + "\\" + dstIfsID.Text + ".ifs";
+            IFS.Refract(inputfile, outputifs);
         }
     }
 }

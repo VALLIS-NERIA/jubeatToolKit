@@ -44,6 +44,8 @@
             this.buttonRepack = new System.Windows.Forms.Button();
             this.Aio_3 = new System.Windows.Forms.Button();
             this.Aio_4 = new System.Windows.Forms.Button();
+            this.ifsTest = new System.Windows.Forms.Button();
+            this.dstIfsID = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -248,11 +250,30 @@
             this.Aio_4.UseVisualStyleBackColor = false;
             this.Aio_4.Click += new System.EventHandler(this.Aio_4_Click);
             // 
+            // ifsTest
+            // 
+            this.ifsTest.Location = new System.Drawing.Point(262, 391);
+            this.ifsTest.Name = "ifsTest";
+            this.ifsTest.Size = new System.Drawing.Size(75, 23);
+            this.ifsTest.TabIndex = 14;
+            this.ifsTest.Text = "ifs";
+            this.ifsTest.UseVisualStyleBackColor = true;
+            this.ifsTest.Click += new System.EventHandler(this.ifsTest_Click);
+            // 
+            // dstIfsID
+            // 
+            this.dstIfsID.Location = new System.Drawing.Point(262, 368);
+            this.dstIfsID.Name = "dstIfsID";
+            this.dstIfsID.Size = new System.Drawing.Size(75, 21);
+            this.dstIfsID.TabIndex = 15;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(374, 430);
+            this.Controls.Add(this.dstIfsID);
+            this.Controls.Add(this.ifsTest);
             this.Controls.Add(this.Aio_4);
             this.Controls.Add(this.Aio_3);
             this.Controls.Add(this.buttonRepack);
@@ -297,6 +318,8 @@
         private System.Windows.Forms.Button buttonRepack;
         private System.Windows.Forms.Button Aio_3;
         private System.Windows.Forms.Button Aio_4;
+        private System.Windows.Forms.Button ifsTest;
+        private System.Windows.Forms.TextBox dstIfsID;
     }
 }
 
