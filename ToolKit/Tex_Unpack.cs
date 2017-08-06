@@ -77,16 +77,16 @@ namespace ToolKit {
             lzss(para.Mode, para.Input, para.Output);
         }
 
-        public static void UnpackFull_D(string inputfolder, string outputfolder) {
+        public static void UnpackFull_D(string inputfolder, string outputfolder, bool genPng = false) {
             string[] files = Directory.GetFiles(inputfolder);
             string name = Path.GetFileName(inputfolder);
             Directory.CreateDirectory(outputfolder);
             foreach (string file in files) {
-                UnpackFull(file, outputfolder);
+                UnpackFull(file, outputfolder, genPng);
             }
         }
 
-        public static void UnpackFull(string inputfile, string outputfolder) {
+        public static void UnpackFull(string inputfile, string outputfolder, bool genPng = false) {
             string workingdir = outputfolder + "\\" + Path.GetFileNameWithoutExtension(inputfile) + "\\";
             Directory.CreateDirectory(workingdir);
             string unpackdir = workingdir + "\\unpack\\";
@@ -94,11 +94,13 @@ namespace ToolKit {
             string pngdir = workingdir + "\\png\\";
             Directory.CreateDirectory(unpackdir);
             Directory.CreateDirectory(decompressdir);
-            Directory.CreateDirectory(pngdir);
             Unpack(inputfile, unpackdir);
             Task.WaitAll(LzssDir(1, unpackdir, decompressdir));
             //LzssDir(1, unpackdir, decompressdir);
-            Picture.DecodeDir(decompressdir, pngdir);
+            if (genPng) {
+                Directory.CreateDirectory(pngdir);
+                Picture.DecodeDir(decompressdir, pngdir);
+            }
             string newfile = workingdir + "\\" + Path.GetFileName(inputfile);
             File.Copy(inputfile, newfile, true);
             File.SetAttributes(newfile, FileAttributes.Normal);

@@ -12,6 +12,9 @@ using System.Drawing.Imaging;
 namespace ToolKit {
     static public class Picture {
 
+        public static Form1 frm = null;
+        const string what = "what.png";
+
         struct TransPara {
             public string Inputfile;
             public string Outputfile;
@@ -38,6 +41,8 @@ namespace ToolKit {
                     byte2png(file, outfile);
                 }
                 catch (Exception e) {
+
+                    File.Copy(what, outfile);
                     //return false;
                 }
             }
@@ -72,14 +77,20 @@ namespace ToolKit {
         public static ConvertResult rgba2png(string inputfile, string outputfile) {
             FileStream f = new FileStream(inputfile, FileMode.Open, FileAccess.ReadWrite);
             f.Seek(0x14, SeekOrigin.Begin);
-            if (readint(ref f) != 0x11221010)
+            if (readint(ref f) != 0x11221010) {
+                //File.Copy(what, outputfile);
+                f.Close();
                 return ConvertResult.FormatNotMatch;
+            }
             f.Seek(0x10, SeekOrigin.Begin);
             int width = readint16(ref f);
             int height = readint16(ref f);
             f.Seek(0x40, SeekOrigin.Begin);
-            if (width == 0 || height == 0)
+            if (width == 0 || height == 0) {
+                File.Copy(what, outputfile);
+                f.Close();
                 return ConvertResult.ZeroPixel;
+            }
             try {
                 Bitmap image = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 for (int y = 0; y < height; y++)
@@ -95,6 +106,7 @@ namespace ToolKit {
                 image.Save(outputfile, ImageFormat.Png);
             }
             catch (System.Exception e) {
+                File.Copy(what, outputfile);
                 f.Close();
                 return ConvertResult.FileCorrupt;
             }
@@ -108,7 +120,7 @@ namespace ToolKit {
         /// <param name="inputfile">输入文件</param>
         /// <param name="outputfile">输出文件</param>
         public static void byte2png(string inputfile, string outputfile) {
-            FileStream f = new FileStream(inputfile, FileMode.Open, FileAccess.ReadWrite);
+            FileStream f = new FileStream(inputfile, FileMode.Open, FileAccess.Read);
             f.Seek(0x10, SeekOrigin.Begin);
             int width = readint16(ref f);
             int height = readint16(ref f);
@@ -119,9 +131,15 @@ namespace ToolKit {
             try {
                 for (int y = 0; y < height; y++)
                     for (int x = 0; x < width; x++) {
+                        
                         int r = 0xff;
                         int g = 0xff;
                         int b = 0xff;
+                        if (outputfile.Contains("MINI")) {
+                            r = 0x00;
+                            g = 0x00;
+                            b = 0x00;
+                        }
                         int a = (int)f.ReadByte();
                         image.SetPixel(x, y, Color.FromArgb(a, r, g, b));
                         i++;
@@ -169,6 +187,9 @@ namespace ToolKit {
         }
 
         public static void png2rgba(string inputfile, string outputfile) {
+            if (!File.Exists(inputfile)) {
+                frm.Log("png2rbga: File " + inputfile + " not Found!");
+            }
             FileStream w = new FileStream(outputfile, FileMode.Create, FileAccess.Write);
             Bitmap image = new Bitmap(inputfile);
             short width = (short)image.Width;

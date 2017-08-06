@@ -46,6 +46,12 @@
             this.Aio_4 = new System.Windows.Forms.Button();
             this.ifsTest = new System.Windows.Forms.Button();
             this.dstIfsID = new System.Windows.Forms.TextBox();
+            this.ifsList = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.texList = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -91,7 +97,7 @@
             // 
             // buttonUnpack
             // 
-            this.buttonUnpack.Location = new System.Drawing.Point(12, 317);
+            this.buttonUnpack.Location = new System.Drawing.Point(12, 335);
             this.buttonUnpack.Name = "buttonUnpack";
             this.buttonUnpack.Size = new System.Drawing.Size(75, 45);
             this.buttonUnpack.TabIndex = 4;
@@ -156,7 +162,7 @@
             // 
             // buttonDecompressMT
             // 
-            this.buttonDecompressMT.Location = new System.Drawing.Point(98, 317);
+            this.buttonDecompressMT.Location = new System.Drawing.Point(98, 335);
             this.buttonDecompressMT.Name = "buttonDecompressMT";
             this.buttonDecompressMT.Size = new System.Drawing.Size(75, 45);
             this.buttonDecompressMT.TabIndex = 6;
@@ -166,7 +172,7 @@
             // 
             // buttonDecode
             // 
-            this.buttonDecode.Location = new System.Drawing.Point(180, 317);
+            this.buttonDecode.Location = new System.Drawing.Point(180, 335);
             this.buttonDecode.Name = "buttonDecode";
             this.buttonDecode.Size = new System.Drawing.Size(75, 45);
             this.buttonDecode.TabIndex = 7;
@@ -176,7 +182,7 @@
             // 
             // buttonEncode
             // 
-            this.buttonEncode.Location = new System.Drawing.Point(262, 317);
+            this.buttonEncode.Location = new System.Drawing.Point(262, 335);
             this.buttonEncode.Name = "buttonEncode";
             this.buttonEncode.Size = new System.Drawing.Size(75, 45);
             this.buttonEncode.TabIndex = 8;
@@ -214,7 +220,7 @@
             // 
             // buttonRepack
             // 
-            this.buttonRepack.Location = new System.Drawing.Point(12, 368);
+            this.buttonRepack.Location = new System.Drawing.Point(12, 386);
             this.buttonRepack.Name = "buttonRepack";
             this.buttonRepack.Size = new System.Drawing.Size(75, 46);
             this.buttonRepack.TabIndex = 11;
@@ -252,7 +258,7 @@
             // 
             // ifsTest
             // 
-            this.ifsTest.Location = new System.Drawing.Point(262, 391);
+            this.ifsTest.Location = new System.Drawing.Point(262, 409);
             this.ifsTest.Name = "ifsTest";
             this.ifsTest.Size = new System.Drawing.Size(75, 23);
             this.ifsTest.TabIndex = 14;
@@ -262,16 +268,81 @@
             // 
             // dstIfsID
             // 
-            this.dstIfsID.Location = new System.Drawing.Point(262, 368);
+            this.dstIfsID.Location = new System.Drawing.Point(262, 386);
             this.dstIfsID.Name = "dstIfsID";
             this.dstIfsID.Size = new System.Drawing.Size(75, 21);
             this.dstIfsID.TabIndex = 15;
+            // 
+            // ifsList
+            // 
+            this.ifsList.Location = new System.Drawing.Point(98, 386);
+            this.ifsList.Name = "ifsList";
+            this.ifsList.Size = new System.Drawing.Size(75, 46);
+            this.ifsList.TabIndex = 16;
+            this.ifsList.Text = "IFSLIST";
+            this.ifsList.UseVisualStyleBackColor = true;
+            this.ifsList.Click += new System.EventHandler(this.ifsList_Click);
+            // 
+            // label1
+            // 
+            this.label1.Location = new System.Drawing.Point(102, 289);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(153, 23);
+            this.label1.TabIndex = 17;
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // texList
+            // 
+            this.texList.Location = new System.Drawing.Point(181, 386);
+            this.texList.Name = "texList";
+            this.texList.Size = new System.Drawing.Size(75, 46);
+            this.texList.TabIndex = 18;
+            this.texList.Text = "TEXLIST";
+            this.texList.UseVisualStyleBackColor = true;
+            this.texList.Click += new System.EventHandler(this.texList_Click);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(12, 289);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(42, 16);
+            this.checkBox1.TabIndex = 19;
+            this.checkBox1.Text = "Pic";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(369, 22);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBox1.Size = new System.Drawing.Size(351, 410);
+            this.textBox1.TabIndex = 20;
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(12, 312);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(48, 16);
+            this.checkBox2.TabIndex = 21;
+            this.checkBox2.Text = "Lzss";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(374, 430);
+            this.ClientSize = new System.Drawing.Size(732, 454);
+            this.Controls.Add(this.checkBox2);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.texList);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.ifsList);
             this.Controls.Add(this.dstIfsID);
             this.Controls.Add(this.ifsTest);
             this.Controls.Add(this.Aio_4);
@@ -320,6 +391,12 @@
         private System.Windows.Forms.Button Aio_4;
         private System.Windows.Forms.Button ifsTest;
         private System.Windows.Forms.TextBox dstIfsID;
+        private System.Windows.Forms.Button ifsList;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button texList;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.CheckBox checkBox2;
     }
 }
 
